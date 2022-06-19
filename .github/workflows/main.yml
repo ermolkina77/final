@@ -40,8 +40,8 @@ jobs:
       - name: Download
         uses: actions/download-artifact@v3
         with:
-          name: app
-          path: my-artifact
+          name: my-artifact
+          path: app
         
       - name: Display structure
         run: ls -R
