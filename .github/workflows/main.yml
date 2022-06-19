@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+          
+      - name: Print env
+        run: env
+      
+      - name: Build cpp
+        run: g++ hw.cpp -o app
+        
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-artifact
+          path: app
+          retention-days: 3
+          
+  fail:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    if: always() && needs.build.result == 'failure'
+    steps:
+    
+      - name: Send fail
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: 'You have some problems, check your code'
+        
+  success:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    if: always() && needs.build.result == 'success'
+    steps:
+    
+      - name: Send success
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message:  |
+            All is okey
+            You can watch changes and take your artifact here: https://github.com/${{ github.repository }}
