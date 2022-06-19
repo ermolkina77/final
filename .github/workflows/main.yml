@@ -30,3 +30,10 @@ jobs:
       
       - name: Build cpp
         run: g++ hw.cpp -o app
+        
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@3
+        with:
+          name: my-artifact
+          path: app
+          retention-days: 3
